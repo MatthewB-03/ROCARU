@@ -11,11 +11,11 @@ public class scp_nearRobo : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        script.AddToNeerby(other.gameObject);
+        script.AddToNearby(other.gameObject);
     }
     private void OnTriggerExit(Collider other)
     {
-        script.RemoveFromNeerby(other.gameObject);
+        script.RemoveFromNearby(other.gameObject);
     }
 
 }

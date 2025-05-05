@@ -45,7 +45,7 @@ public class scp_robotDog : MonoBehaviour
     [SerializeField] CapsuleCollider neerbyCollider;
     float neerRadius = 4;
     float searchRadius = 20;
-    public GameObject[] neerbyObjects;
+    public GameObject[] nearbyObjects;
 
     // Pathing
     [Header("Pathing")]
@@ -110,7 +110,7 @@ public class scp_robotDog : MonoBehaviour
         signalUI = GameObject.Find("SignalStengthIndicator").GetComponent<Animator>();
         signalStatic = GameObject.Find("CamStatic").GetComponent<Animator>();
         malfunctionManager = GameObject.Find("MalfunctionManager").GetComponent < scp_malfunctionManager>();
-        neerbyObjects = new GameObject[0];
+        nearbyObjects = new GameObject[0];
         neerbyCollider.radius = neerRadius;
         holoInput = holoDog.GetComponent<StarterAssetsInputs>();
         dogInput = dog.GetComponent<StarterAssetsInputs>();
@@ -336,7 +336,6 @@ public class scp_robotDog : MonoBehaviour
             signalStatic.SetFloat("strength", 100);
         }
         signalUI.SetFloat("strength", signalStrength);
-        //Debug.Log(signalStrength);
     }
 
     //Checks if the signal is lost
@@ -365,15 +364,15 @@ public class scp_robotDog : MonoBehaviour
         audio.clip = sound;
     }
 
-    // - NEERBY -
+    // - NEARBY -
 
-    //Returns true if other is in the neerby array
-    public bool IsNeerby(GameObject other)
+    //Returns true if other is in the nearby array
+    public bool IsNearby(GameObject other)
     {
         bool isThere = false;
-        foreach (GameObject neer in neerbyObjects)
+        foreach (GameObject near in nearbyObjects)
         {
-            if (other == neer)
+            if (other == near)
             {
                 isThere = true;
             }
@@ -381,63 +380,63 @@ public class scp_robotDog : MonoBehaviour
 
         return isThere;
     }
-    // Other is now neerby
-    public void AddToNeerby(GameObject other)
+    // Other is now nearby
+    public void AddToNearby(GameObject other)
     {
         //Debug.Log("add"+other.name);
         if (other != null)
         {
-            if (!IsNeerby(other))
+            if (!IsNearby(other))
             {
-                GameObject[] newArray = new GameObject[neerbyObjects.Length + 1];
+                GameObject[] newArray = new GameObject[nearbyObjects.Length + 1];
                 int i = 0;
-                while (i < neerbyObjects.Length)
+                while (i < nearbyObjects.Length)
                 {
-                    newArray[i] = neerbyObjects[i];
+                    newArray[i] = nearbyObjects[i];
                     i++;
                 }
                 newArray[i] = other;
-                neerbyObjects = newArray;
+                nearbyObjects = newArray;
 
             }
         }
     }
-    // Other is no longer neerby
-    public void RemoveFromNeerby(GameObject other)
+    // Other is no longer nearby
+    public void RemoveFromNearby(GameObject other)
     {
-        if (neerbyObjects.Length > 1) // Ensure array is longer than 1 item
+        if (nearbyObjects.Length > 1) // Ensure array is longer than 1 item
         {
-            GameObject[] newArray = new GameObject[neerbyObjects.Length - 1];
+            GameObject[] newArray = new GameObject[nearbyObjects.Length - 1];
             int i = 0;
             bool removed = false;
-            while (i + 1 < neerbyObjects.Length)
+            while (i + 1 < nearbyObjects.Length)
             {
                 if (removed)
                 {
-                    newArray[i] = neerbyObjects[i + 1];
+                    newArray[i] = nearbyObjects[i + 1];
                 }
-                else if (neerbyObjects[i] != other)
+                else if (nearbyObjects[i] != other)
                 {
-                    newArray[i] = neerbyObjects[i];
+                    newArray[i] = nearbyObjects[i];
                 }
                 else
                 {
-                    newArray[i] = neerbyObjects[i + 1];
+                    newArray[i] = nearbyObjects[i + 1];
                     removed = true;
                 }
                 i++;
             }
-            neerbyObjects = newArray;
+            nearbyObjects = newArray;
         }
-        else if (neerbyObjects.Length == 1) // If exactly one item, just make an empty array.
+        else if (nearbyObjects.Length == 1) // If exactly one item, just make an empty array.
         {
-            neerbyObjects = new GameObject[0];
+            nearbyObjects = new GameObject[0];
         }
     }
 
     // - REPAIR -
 
-    // If any neerby objects are repairable, repair the best one.
+    // If any nearby objects are repairable, repair the best one.
     void AttemptRepair()
     {
         GameObject repair = GetBestRepair();
@@ -504,13 +503,13 @@ public class scp_robotDog : MonoBehaviour
         float bestScore = 0;
         GameObject bestRepair = this.gameObject;
 
-        for (int i = 0; i<neerbyObjects.Length; i++)
+        for (int i = 0; i<nearbyObjects.Length; i++)
         {
             float repairScore;
-            if (neerbyObjects[i] != null)
+            if (nearbyObjects[i] != null)
             {
-                scp_repairScript repairScript = neerbyObjects[i].GetComponent<scp_repairScript>();
-                Vector3 delta = neerbyObjects[i].transform.position - dog.transform.position;
+                scp_repairScript repairScript = nearbyObjects[i].GetComponent<scp_repairScript>();
+                Vector3 delta = nearbyObjects[i].transform.position - dog.transform.position;
 
                 if (repairScript == null)
                 {
@@ -541,7 +540,7 @@ public class scp_robotDog : MonoBehaviour
                 }
                 if (repairScore >= bestScore)
                 {
-                    bestRepair = neerbyObjects[i];
+                    bestRepair = nearbyObjects[i];
                     bestScore = repairScore;
                 }
             }
@@ -567,7 +566,7 @@ public class scp_robotDog : MonoBehaviour
 
         yield return new WaitForSeconds(searchTime);
 
-        GameObject[] enemies = GetNeerEnemies();
+        GameObject[] enemies = GetNearEnemies();
 
         if (enemies.Length != 0)
         {
@@ -580,11 +579,11 @@ public class scp_robotDog : MonoBehaviour
     }
 
     // Returns all enemies currently in range
-    GameObject[] GetNeerEnemies()
+    GameObject[] GetNearEnemies()
     {
         GameObject[] enemies = new GameObject[0];
 
-        foreach (GameObject other in neerbyObjects)
+        foreach (GameObject other in nearbyObjects)
         {
             if (other != null)
             {
@@ -601,7 +600,7 @@ public class scp_robotDog : MonoBehaviour
             }
             else
             {
-                RemoveFromNeerby(other);
+                RemoveFromNearby(other);
             }
         }
 

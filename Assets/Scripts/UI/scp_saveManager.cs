@@ -143,7 +143,6 @@ public class scp_saveManager : MonoBehaviour
         PlayerPrefs.SetString("EN", Enemies()); // Enemies
         PlayerPrefs.SetString("RP", Repairs()); // Repairs
         PlaySound(yesSound, 0.5f);
-        //Debug.Log(PlayerPrefs.GetString("RP"));
     }
 
     string PlayerTransform()
@@ -165,14 +164,6 @@ public class scp_saveManager : MonoBehaviour
         {
             scp_enemyScript enemyScript = enemy.GetComponent<scp_enemyScript>();
             text = text + enemy.name.ToString();
-            /*
-            text = text + "," + enemy.transform.position.x.ToString();
-            text = text + "," + enemy.transform.position.y.ToString();
-            text = text + "," + enemy.transform.position.z.ToString();
-            text = text + "," + enemy.transform.eulerAngles.x.ToString();
-            text = text + "," + enemy.transform.eulerAngles.y.ToString();
-            text = text + "," + enemy.transform.eulerAngles.z.ToString();
-            */
             text = text + enemy.GetComponent<scp_enemyScript>().GetSaveValues() + "\n";
         }
         return text;
